@@ -1,0 +1,253 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索</title>
+    <link rel="stylesheet" href="{% static 'css/search.css' %}">
+    <script src="{% static 'js/jquery-3.7.0.js' %}"></script>
+</head>
+<body>
+    <div id="global">
+        <div id="head">
+            <div id="freeSearch">
+                Free Search
+            </div>
+            <div id="searchBar">
+                <input type="text" id="inputSearch" name="word" size="30" placeholder="搜索" autocomplete="off" value="{{key}}">
+                <div class="searchBarBtn" id="btnSearchEng"><i id="iconSearchEng"></i></div>
+                <div class="searchBarBtn" id="btnSearch"><i id="iconSearch"></i></div>
+            </div>
+            <button id="advance">高级搜索</button>
+            <div id="username"></div>
+        </div>
+        <div id="advanceSearch">
+            <div class="oneAdvance">
+                <div class="adtext">站内查询：</div>
+                <input class="adinput" type="text" id="site" style="padding: 5px;font-size:15px">
+            </div>
+            <div class="oneAdvance">
+                <div class="adtext">查询方式：</div>
+                <div class="adinput">
+                    <div style="display: flex;justify-content:center;">
+                        <div style="margin-right: 10px;">短语查询</div>
+                        <input type="checkbox" id="phrase" style="padding: 5px;font-size:15px;margin-right: 10px;" name="phrase">
+                        <div style="margin-right: 10px;">布尔查询</div>
+                        <input type="checkbox" id="bool" style="padding: 5px;font-size:15px;margin-right: 10px;" name="bool" checked>
+                    </div>
+                </div>
+            </div>
+            <div class="oneAdvance bool">
+                <div class="adtext">必须包含：</div>
+                <input class="adinput" type="text" id="boolMust" style="padding: 5px;font-size:15px">
+            </div>
+            <div class="oneAdvance bool">
+                <div class="adtext">不能包含：</div>
+                <input class="adinput" type="text" id="boolMustNot" style="padding: 5px;font-size:15px">
+            </div>
+            <div class="oneAdvance bool">
+                <div class="adtext">可以包含：</div>
+                <input class="adinput" type="text" id="boolShould" style="padding: 5px;font-size:15px">
+            </div>
+            <div class="oneAdvance">
+                <div class="adtext">查询日志：</div>
+                <input class="adinput" type="checkbox" id="log" style="padding: 5px;font-size:15px" name="log">
+            </div>
+            <div class="oneAdvance">
+                <div class="adtext">查询位置：</div>
+                <div class="adinput">
+                    <div style="display: flex;justify-content:center;">
+                        <div style="margin-right: 10px;">链接</div>
+                        <input type="checkbox" id="url" style="padding: 5px;font-size:15px;margin-right: 10px;" name="url" checked>
+                        <div style="margin-right: 10px;">标题</div>
+                        <input type="checkbox" id="title" style="padding: 5px;font-size:15px;margin-right: 10px;" name="title" checked>
+                        <div style="margin-right: 10px;">内容</div>
+                        <input type="checkbox" id="content" style="padding: 5px;font-size:15px;margin-right: 10px;" name="content" checked>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="main">
+            <div id="searchBody">
+                <div>搜索结果</div>
+                <ol>
+                    {% for i in data %}
+                    <li class="searchEntry" id="{{i.id}}">
+                        <a href="{{i.url}}">
+                            <div class="entryUrl">{{i.url_text|safe}}</div>
+                            <div class="entryTitle">{{i.title|safe}}</div>
+                        </a>
+                        <div class="entryContent">网页：{{i.content|safe}}...</div>
+                        <div class="entryScore">相关性得分：{{i.score}}</div>
+                        <div class="entryRank">PageRank：{{i.page_rank}}</div>
+                        <div class="entrySims">与用户历史记录相关性：{{i.sims|default:"None"}}</div>
+                    </li>
+                    {% endfor %}
+
+                </ol>
+            </div>
+            <div id="more">
+                <div>更多推荐</div>
+                <ol class="part">
+                    {% for i in more %}
+                    <li>
+                        <a href="{{i.url}}">{{i.title}}</a>
+                    </li>
+                    {% endfor %}
+                </ol>
+            </div>
+            
+        </div>
+        
+    </div>
+    <script>
+        $(function(){
+            var username = sessionStorage.getItem("username");
+            $("#username").text("当前用户："+ username);
+        })
+        $("#phrase").click(function(){
+            if($("#phrase").prop("checked") == true){
+                $("#bool").prop("checked", false);
+            }
+        })
+        $("#bool").click(function(){
+            if($("#bool").prop("checked") == true){
+                $("#phrase").prop("checked", false);
+                $(".bool").css("display", "table-row");
+            }
+            else {
+                $(".bool").css("display", "none");
+            }
+        })
+        $("#log").click(function(){
+            if($("#log").prop("checked") == true){
+                $(".entryScore").css("display", "flex");
+                $(".entryRank").css("display", "flex");
+                $(".entrySims").css("display", "flex");
+            }
+            else {
+                $(".entryScore").css("display", "none");
+                $(".entryRank").css("display", "none");
+                $(".entrySims").css("display", "none");
+            }
+        })
+        $('#btnSearch').click(function () {
+            if ($('#inputSearch').val() == '' && $("#bool").prop("checked") == false) return;
+            if(showAdvance == false){
+                location.href = `/search?key=${$('#inputSearch').val()}&username=${sessionStorage.getItem("username")}` ;
+            }
+            else {
+                var data = {}
+                data["username"] = sessionStorage.getItem("username");
+                data["key"] = $('#inputSearch').val();
+                data["site"] = $("#site").val();
+                if($("#phrase").prop("checked") == true) {
+                    data["queryType"] = "match_phrase";
+                }
+                else if($("#bool").prop("checked") == true) {
+                    data["queryType"] = "bool";
+                    data["boolFilter"] = {
+                        must: $("#boolMust").val(),
+                        must_not: $("#boolMustNot").val(),
+                        should: $("#boolShould").val(),
+                    };
+                }
+                else {
+                    data["queryType"] = "none";
+                }
+                data["field"] = []
+                if($("#url").prop("checked") == true) {
+                    data["field"].push("url");
+                }
+                if($("#title").prop("checked") == true) {
+                    data["field"].push("title");
+                }
+                if($("#content").prop("checked") == true) {
+                    data["field"].push("content");
+                }
+                if(data["field"].length == 0){
+                    alert("至少选择一项查询字段！");
+                    return;
+                }
+                console.log(data);
+                $.ajax({
+                    url:"/search/advance",
+                    dataType: "json",
+                    type: "post",
+                    data: data,
+                    success: function(res) {
+                        console.log(res);
+                        if(res["code"] != 0){
+                            alert("请求失败，错误码：" + res["code"]);
+                        }
+                        else {
+                            setSearchRes(res["data"]);
+                            setMoreRes(res["more"]);
+                        }
+                    },
+                    error:function(){
+                        alert("发送查询请求失败！");
+                    }
+                })
+            }
+        });
+        function setSearchRes(data) {
+            $("#searchBody > ol").empty();
+            for(let entry of data){
+                $("#searchBody > ol").append(`                    <li class="searchEntry" id="${entry["id"]}">
+                    <a href="${entry["url"]}">
+                        <div class="entryUrl">${entry["url_text"]}</div>
+                        <div class="entryTitle">${entry["title"]}</div>
+                    </a>
+                    <div class="entryContent">网页：${entry["content"]}...</div>
+                    <div class="entryScore">相关性得分：${entry["score"]}</div>
+                    <div class="entryRank">PageRank：${entry["page_rank"]}</div>
+                    <div class="entrySims">与用户历史记录相关性：${entry["sims"]}</div>
+                </li>`);
+            }
+        }
+        function setMoreRes(data) {
+            console.log("more: ",data);
+            $("#more > ol").empty();
+            for(let entry of data) {
+                $("#more > ol").append(`<li>
+                    <a href="${entry["url"]}">${entry["title"]}</a>
+                </li>`);
+            }
+        }
+        $('#inputSearch').bind('keypress', function (event) {
+            if (event.keyCode == "13") {
+                $("#btnSearch").click();
+            }
+        });
+        var showAdvance = false;
+        $('#advance').click(function(){
+            if(showAdvance == true){
+                $('#advanceSearch').css("display","none");
+                showAdvance = false;
+            }
+            else if(showAdvance == false){
+                $('#advanceSearch').css("display", "table");
+                showAdvance = true;
+            }
+        })
+        // 向服务器发送用户点击记录
+        $(".searchEntry").click(function(){
+            $.ajax({
+                url:"/user",
+                dataType: "json",
+                type: "post",
+                data: {
+                    name: sessionStorage.getItem("username"),
+                    action: "add_history",
+                    history: $(this).attr("id")
+                },
+                success:function(res){
+                    console.log(res);
+                }
+            })
+        })
+    </script>
+</body>
+</html>

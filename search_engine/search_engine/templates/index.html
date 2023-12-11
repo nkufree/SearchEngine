@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主页</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <script src="{% static 'js/jquery-3.7.0.js' %}"></script>
+</head>
+<body>
+    <div id="bgDiv"><img id="bgImg" alt src="{% static 'img/bg.jpg' %}"></div>
+    <div style="display: flex;justify-content:center; margin-top:40px;"><span style="color: white;font-size: 40px;" id="username">{{request.session.username}}</span></div>
+    <div id="searchBar">
+        <input type="text" id="inputSearch" name="word" size="30" placeholder="搜索" autocomplete="off">
+        <div class="searchBarBtn" id="btnSearchEng"><i id="iconSearchEng"></i></div>
+        <div class="searchBarBtn" id="btnSearch"><i id="iconSearch"></i></div>
+    </div>
+    <script>
+        $('#inputSearch').click(function(e){
+            $('body').attr('class','search');
+            e.stopPropagation();
+        })
+        $(document).click(function (e) {
+            $('body').removeAttr('class');
+        });
+        $('#btnSearch').click(function(e){
+            if ($('#inputSearch').val() == '') return;
+            sessionStorage.setItem("username", $("#username").text());
+            location.href = `/search?key=${$('#inputSearch').val()}&username=${sessionStorage.getItem("username")}`;
+        });
+        $('#inputSearch').bind('keypress', function (event) {
+            if (event.keyCode == "13") {
+                $("#btnSearch").click();
+            }
+        });
+    </script>
+</body>
+</html>
