@@ -138,6 +138,7 @@ body {
 .logPart {
     display: none;
     flex-direction: column;
+    color: gray;
 }
 
 .entryScore {

@@ -35,11 +35,11 @@ def get_standard_data(res, username=None, count=20):
         except:
             title = page["_source"]["title"]
         try:
-            content = page["highlight"]["content"][0]
+            content = " ".join(page["highlight"]["content"])
         except:
             content = page["_source"]["content"]
-            if len(content) > 80:
-                content = content[:80]
+            if len(content) > 500:
+                content = content[:500]
         info = {
             "id": page["_id"],
             "url_text": url_text,
@@ -88,14 +88,16 @@ def get_standard_data(res, username=None, count=20):
         tvt["len"] = get_len(tvt)
         inner = [get_inner_product(tvt, i) for i in history_terms]
         info["sims"] = max(inner)
-    # TODO: 更合理的排序
     # data.sort(key=lambda x:x["sims"], reverse=True)
     sort_weight = {"score":0.4, "page_rank":0.4, "sims": 0.2}
     for key in sort_weight.keys():
         max_value = max(data, key=lambda x:x[key])[key]
         min_value = min(data, key=lambda x:x[key])[key]
         for entry in data:
-            entry[key + "_standard"] = (entry[key] - min_value) / (max_value - min_value)
+            if max_value == min_value:
+                entry[key + "_standard"] = 1
+            else:
+                entry[key + "_standard"] = (entry[key] - min_value) / (max_value - min_value)
     for entry in data:
         entry["weighted_score"] = 0
         for key, value in sort_weight.items():
