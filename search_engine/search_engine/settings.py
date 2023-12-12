@@ -87,8 +87,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',   # 指定连接数据库的引擎
         'NAME': 'search_engine',                        # 指定连接的数据库
         'USER': 'root',                         # 数据库的账户
-        'PASSWORD': '190235zzx',                     # 账户的密码
-        # 'PASSWORD': os.environ.get('MYSQL_PWD'), # 从系统环境变量中获取密码
+        'PASSWORD': os.environ.get('MYSQL_PWD'), # 从系统环境变量中获取密码
         'HOST': '127.0.0.1',                    # 数据库的 IP 地址
         'PORT': 3306                            # 数据库的端口号
     }
