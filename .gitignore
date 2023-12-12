@@ -2,3 +2,5 @@ new_pages
 page_link
 page_link_num
 db.sqlite3
+__pycache__/
+.vscode

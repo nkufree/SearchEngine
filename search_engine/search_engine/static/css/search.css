@@ -135,14 +135,19 @@ body {
     margin-bottom: 5px;
 }
 
+.logPart {
+    display: none;
+    flex-direction: column;
+}
+
 .entryScore {
     margin-bottom: 5px;
-    display: none;
+    display: flex;
 }
 
 .entryRank ,.entrySims {
     margin-bottom: 5px;
-    display: none;
+    display: felx;
 }
 
 #username {

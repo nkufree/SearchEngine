@@ -79,9 +79,12 @@
                             <div class="entryTitle">{{i.title|safe}}</div>
                         </a>
                         <div class="entryContent">网页：{{i.content|safe}}...</div>
-                        <div class="entryScore">相关性得分：{{i.score}}</div>
-                        <div class="entryRank">PageRank：{{i.page_rank}}</div>
-                        <div class="entrySims">与用户历史记录相关性：{{i.sims|default:"None"}}</div>
+                        <div class="logPart">
+                            <div class="entryScore">相关性得分：{{i.score}}</div>
+                            <div class="entryRank">PageRank：{{i.page_rank}}</div>
+                            <div class="entrySims">与用户历史记录相关性：{{i.sims|default:"None"}}</div>
+                            <div class="entryScore">加权后的得分：{{i.weighted_score}}</div>
+                        </div>
                     </li>
                     {% endfor %}
 
@@ -122,14 +125,16 @@
         })
         $("#log").click(function(){
             if($("#log").prop("checked") == true){
-                $(".entryScore").css("display", "flex");
-                $(".entryRank").css("display", "flex");
-                $(".entrySims").css("display", "flex");
+                //$(".entryScore").css("display", "flex");
+                $(".logPart").css("display", "flex");
+                //$(".entryRank").css("display", "flex");
+                // $(".entrySims").css("display", "flex");
             }
             else {
-                $(".entryScore").css("display", "none");
-                $(".entryRank").css("display", "none");
-                $(".entrySims").css("display", "none");
+                $(".logPart").css("display", "none");
+                //$(".entryScore").css("display", "none");
+                //$(".entryRank").css("display", "none");
+                //$(".entrySims").css("display", "none");
             }
         })
         $('#btnSearch').click(function () {
@@ -201,9 +206,12 @@
                         <div class="entryTitle">${entry["title"]}</div>
                     </a>
                     <div class="entryContent">网页：${entry["content"]}...</div>
-                    <div class="entryScore">相关性得分：${entry["score"]}</div>
-                    <div class="entryRank">PageRank：${entry["page_rank"]}</div>
-                    <div class="entrySims">与用户历史记录相关性：${entry["sims"]}</div>
+                    <div class="logPart">
+                        <div class="entryScore">相关性得分：${entry["score"]}</div>
+                        <div class="entryRank">PageRank：${entry["page_rank"]}</div>
+                        <div class="entrySims">与用户历史记录相关性：${entry["sims"]}</div>
+                        <div class="entryScore">加权后的得分：${entry["weighted_score"]}</div>
+                    </div>
                 </li>`);
             }
         }

@@ -89,7 +89,19 @@ def get_standard_data(res, username=None, count=20):
         inner = [get_inner_product(tvt, i) for i in history_terms]
         info["sims"] = max(inner)
     # TODO: 更合理的排序
-    data.sort(key=lambda x:x["sims"], reverse=True)
+    # data.sort(key=lambda x:x["sims"], reverse=True)
+    sort_weight = {"score":0.4, "page_rank":0.4, "sims": 0.2}
+    for key in sort_weight.keys():
+        max_value = max(data, key=lambda x:x[key])[key]
+        min_value = min(data, key=lambda x:x[key])[key]
+        for entry in data:
+            entry[key + "_standard"] = (entry[key] - min_value) / (max_value - min_value)
+    for entry in data:
+        entry["weighted_score"] = 0
+        for key, value in sort_weight.items():
+            entry["weighted_score"] += entry[key+"_standard"] * value
+    data.sort(key=lambda x:x["weighted_score"], reverse=True)
+    
     # 获取推荐结果
     recommand = get_recommend_data(history)
     return data, recommand
