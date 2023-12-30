@@ -63,7 +63,7 @@ def get_standard_data(res, username=None, count=20):
         if i["name"] == username:
             history = i["history"]
             break
-    if history == None:
+    if history == None or len(history) == 0:
         return data, recommand
     # 按照与用户历史记录文档的相关性排序
     # 1) 构建历史记录文档的向量
@@ -222,8 +222,8 @@ def search_advance(request, method='POST'):
     res = es.search(index='index', body=query)
     ret, recommend = get_standard_data(res, data["username"])
     # print("搜索结果：", ret)
-    # if data["site"] != "":
-    
+    if data["site"] != "":
+        ret = list(filter(lambda x:re.match(data["site"] + ".*", x["url"]), ret))
     # 返回数据
     # res = []
     # testEntry = {
